@@ -1,102 +1,215 @@
 <template>
   <div class="terminal">
-    <OutputComponent :history="history" />
+    <OutputComponent :pwd="pwd" :history="history" />
     <div class="input-area">
-      ~ {{ userInput.replace(/\s/g, '&nbsp;') }}
-      <div class="cursor" ref="cursor"></div>
+      {{ pwd }}
+      <span
+        class="characters"
+        v-if="userInput.length === 0"
+        style="color: transparent"
+      >
+        1
+        <div class="cursor default-cursor"></div>
+      </span>
+      <span
+        :class="{
+          'cursor-on': currentPos === idx || (idx === 0 && currentPos === 0)
+        }"
+        class="characters"
+        v-for="(character, idx) in userInput"
+        :key="idx"
+      >
+        {{ character.replace(/\s/g, '&nbsp;') }}
+        <div
+          :class="{ 'first-cursor': currentPos === 0 }"
+          class="cursor"
+          v-show="currentPos - 1 === idx || (idx === 0 && currentPos === 0)"
+        ></div>
+      </span>
     </div>
-    <input ref="input" type="text" v-model="userInput" maxlength="50" />
+    <input
+      ref="input"
+      type="text"
+      v-model="userInput"
+      @keydown="pressedEvent"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import OutputComponent from './OutputComponent.vue'
-import CommandHistory from '../constant/history'
-import { ref, defineExpose, onMounted } from 'vue'
+import OutputComponent from '@/components/OutputComponent.vue'
+import commands from '@/handles/commands'
+import CommandHistory from '@/constant/history'
+import INIT_MESSAGE from '@/constant/initMessage'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const userInput = ref<string>('')
-const history = ref<Array<CommandHistory>>([
-  {
-    id: 0,
-    val: 'haha'
-  }
-])
+const currentPos = ref<number>(0)
+const currentHistory = ref<number>(1)
+const loopThroughHistory = ref<boolean>(false)
+const flagHistory = ref<boolean>(false)
 const input = ref<HTMLInputElement>()
-const cursor = ref<HTMLInputElement>()
+const history = ref<Array<CommandHistory>>([INIT_MESSAGE])
+const pwd = ref<string>('~')
 
 const submit = () => {
+  if (/^!(\d+)$/.test(userInput.value)) {
+    flagHistory.value = true
+    userInput.value = commands.run(userInput.value)
+    return
+  }
+  const output: string = commands.run(userInput.value)
   const val: CommandHistory = {
     id: history.value.length,
-    val: userInput.value,
-    output: ''
+    val: userInput.value.trimStart().replace(/\s/g, '&nbsp;'),
+    output
   }
   history.value.push(val)
   userInput.value = ''
+  if (flagHistory.value) return
+  flagHistory.value = false
+  const localHistory = [
+    ...JSON.parse(localStorage.getItem('history') || '[]'),
+    val
+  ]
+  localStorage.setItem('history', JSON.stringify(localHistory))
 }
 
 const moveCursor = (key: string) => {
-  const cur = cursor.value
-  if (!cur) return
   switch (true) {
     case /^Enter$/g.test(key):
-    case /^ArrowUp$/g.test(key):
-      cur.style.left = '23px'
+      currentPos.value = userInput.value.length
       break
-    case /^[\w\s]$/g.test(key):
-      if (userInput.value.length < 50) {
-        console.log(userInput.value.length)
+    case /^ArrowUp$/g.test(key):
+      if (userInput.value.length === 0 || loopThroughHistory.value) {
+        loopThroughHistory.value = true
+        getHistory()
+      } else {
+        currentPos.value = 0
       }
+      break
+    case /^Backspace$/g.test(key):
+      if (currentPos.value > 0) {
+        currentPos.value--
+      }
+      loopThroughHistory.value = false
+      break
+    case /^ArrowLeft$/g.test(key):
+      if (currentPos.value <= userInput.value.length && currentPos.value > 0) {
+        currentPos.value--
+      }
+      loopThroughHistory.value = false
+      break
+    case /^ArrowDown$/g.test(key):
+      currentPos.value = userInput.value.length
+      loopThroughHistory.value = false
+      break
+    case /^ArrowRight$/g.test(key):
+    case /^.$/g.test(key):
+      if (currentPos.value < userInput.value.length && currentPos.value >= 0) {
+        currentPos.value++
+      }
+      loopThroughHistory.value = false
       break
     default:
       break
   }
 }
 
+const getHistory = () => {
+  let lastHistory = history.value[currentHistory.value - 1]
+  while (!lastHistory.val) {
+    currentHistory.value--
+    lastHistory = history.value[currentHistory.value - 1]
+    if (currentHistory.value < 1) {
+      lastHistory = history.value[0]
+      currentHistory.value = history.value.length
+      break
+    }
+  }
+  userInput.value = lastHistory.val
+  currentPos.value = userInput.value.length
+  currentHistory.value--
+  if (currentHistory.value < 1) {
+    currentHistory.value = history.value.length
+  }
+}
+
 const pressedEvent = (e: KeyboardEvent) => {
   if (e.key === 'Enter') {
     submit()
-    focusInput()
+    currentHistory.value = history.value.length
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    })
   }
-  if (e.altKey || e.ctrlKey || e.metaKey) {
+
+  if ((e.key === 'a' || e.key === 'v') && (e.ctrlKey || e.metaKey)) {
+    setTimeout(() => {
+      currentPos.value = userInput.value.length
+    })
+  }
+
+  if (e.altKey || e.ctrlKey || (e.shiftKey && e.key.length !== 1)) {
     return
   }
-  moveCursor(e.key)
-  console.log(e.key)
+  setTimeout(() => {
+    moveCursor(e.key)
+  })
 }
 
-const focusInput = () => {
-  input.value?.focus()
-  input.value?.scrollIntoView()
+const focusInput = (e?: KeyboardEvent) => {
+  if (document.activeElement !== input.value) {
+    input.value?.focus()
+    setTimeout(() => {
+      moveCursor(e?.key || '')
+    })
+  }
 }
 
 onMounted(() => {
   focusInput()
-  input.value?.addEventListener('keydown', pressedEvent)
+  localStorage.setItem('pwd', '~')
   const html = document.querySelector('html')
-  html?.addEventListener('click', focusInput)
+  html?.addEventListener('keydown', focusInput, true)
 })
 
-defineExpose({
-  userInput,
-  history
+onBeforeUnmount(() => {
+  const html = document.querySelector('html')
+  html?.removeEventListener('keydown', focusInput, true)
 })
 </script>
 
 <style scoped>
 .input-area {
-  word-break: break-all;
+  position: relative;
+}
+.characters,
+.default-characters {
+  width: fit-content;
+  display: inline-block;
   position: relative;
 }
 .cursor {
   position: absolute;
   content: '';
-  width: 0.7rem;
+  width: 100%;
   height: 90%;
   background-color: #ddd;
   opacity: 0.5;
   top: 0;
-  left: 1.5rem;
+  left: 100%;
   animation: blinking 1.5s infinite;
+}
+.cursor-on {
+  filter: invert(100%);
+}
+.cursor-on > .cursor {
+  filter: invert(100%);
+}
+.default-cursor,
+.first-cursor {
+  left: 0;
 }
 input {
   opacity: 0;
@@ -106,7 +219,7 @@ input {
 
 @keyframes blinking {
   0% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
 
   50% {
@@ -114,7 +227,7 @@ input {
   }
 
   100% {
-    opacity: 0.5;
+    opacity: 0.8;
   }
 }
 </style>

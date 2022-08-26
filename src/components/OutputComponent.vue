@@ -1,29 +1,24 @@
 <template>
-  <div v-for="(item, idx) in history" :key="idx">
-    ~ {{ item.val }} <br />
-    {{ item.output }}
+  <div
+    v-for="(item, idx) in history"
+    :key="idx"
+    :class="{ 'has-output': item.output, 'first-output': idx === 0 }"
+  >
+    <span v-if="idx !== 0" :innerHTML="`${pwd} ${item.val}`"></span>
+    <br />
+    <span :innerHTML="`${item.output || ''}`"></span>
   </div>
 </template>
 
 <script setup lang="ts">
 import CommandHistory from '../constant/history'
-import {
-  defineProps,
-  defineExpose,
-  // toRef,
-  onMounted,
-  PropType
-  // reactive,
-} from 'vue'
+import { defineProps, defineExpose, PropType } from 'vue'
 
 const props = defineProps({
   history: {
     type: Array as PropType<Array<CommandHistory>>
-  }
-})
-
-onMounted(() => {
-  console.log('mounted')
+  },
+  pwd: String || null
 })
 
 defineExpose({
@@ -31,4 +26,12 @@ defineExpose({
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.has-output {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.first-output {
+  margin-bottom: 50px;
+}
+</style>
