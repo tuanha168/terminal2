@@ -1,0 +1,2 @@
+FROM nginx
+COPY deployment/docker/default.conf /etc/nginx/conf.d/

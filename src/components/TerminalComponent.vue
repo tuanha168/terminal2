@@ -2,7 +2,7 @@
   <div class="terminal">
     <OutputComponent :pwd="pwd" :history="history" />
     <div class="input-area">
-      {{ pwd }}
+      {{ pwd?.replace('/home', '~') }}
       <span
         class="characters"
         v-if="userInput.length === 0"
@@ -50,7 +50,7 @@ const loopThroughHistory = ref<boolean>(false)
 const flagHistory = ref<boolean>(false)
 const input = ref<HTMLInputElement>()
 const history = ref<Array<CommandHistory>>([INIT_MESSAGE])
-const pwd = ref<string>('~')
+const pwd = ref<string>('/home')
 
 const submit = () => {
   if (/^!(\d+)$/.test(userInput.value)) {
@@ -58,21 +58,26 @@ const submit = () => {
     userInput.value = commands.run(userInput.value)
     return
   }
-  const output: string = commands.run(userInput.value)
+  let output = ''
+  if (userInput.value === 'clear') {
+    history.value = [INIT_MESSAGE]
+  } else {
+    output = commands.run(userInput.value)
+  }
   const val: CommandHistory = {
     id: history.value.length,
     val: userInput.value.trimStart().replace(/\s/g, '&nbsp;'),
     output
   }
-  history.value.push(val)
-  userInput.value = ''
-  if (flagHistory.value) return
-  flagHistory.value = false
+  if (userInput.value !== 'clear') history.value.push(val)
   const localHistory = [
     ...JSON.parse(localStorage.getItem('history') || '[]'),
     val
   ]
   localStorage.setItem('history', JSON.stringify(localHistory))
+  userInput.value = ''
+  if (flagHistory.value) return
+  flagHistory.value = false
 }
 
 const moveCursor = (key: string) => {
@@ -169,7 +174,7 @@ const focusInput = (e?: KeyboardEvent) => {
 
 onMounted(() => {
   focusInput()
-  localStorage.setItem('pwd', '~')
+  localStorage.setItem('pwd', '/home')
   const html = document.querySelector('html')
   html?.addEventListener('keydown', focusInput, true)
 })

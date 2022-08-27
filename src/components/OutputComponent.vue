@@ -4,9 +4,12 @@
     :key="idx"
     :class="{ 'has-output': item.output, 'first-output': idx === 0 }"
   >
-    <span v-if="idx !== 0" :innerHTML="`${pwd} ${item.val}`"></span>
+    <span
+      v-if="idx !== 0"
+      :innerHTML="`${pwd?.replace('/home', '~')} ${item.val}`"
+    ></span>
     <br />
-    <span :innerHTML="`${item.output || ''}`"></span>
+    <span class="output" :innerHTML="`${item.output || ''}`"></span>
   </div>
 </template>
 
@@ -30,6 +33,9 @@ defineExpose({
 .has-output {
   white-space: pre-wrap;
   word-break: break-word;
+}
+.output {
+  font-weight: normal !important;
 }
 .first-output {
   margin-bottom: 50px;
