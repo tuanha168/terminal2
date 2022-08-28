@@ -50,7 +50,7 @@ Type <span class="red">help</span> for list commands`
     return output
   },
   about: () => {
-    return `I'am <span class="green">Ha Anh Tuan</span>, Communicator in Viet Nam, also a Front-End developer.`
+    return `I'm <span class="green">Ha Anh Tuan</span>, Communicator in Viet Nam, also a Front-End developer.`
   }
 }
 
