@@ -1,7 +1,11 @@
-FROM node:14
-WORKDIR /usr/src/app
-COPY ./package*.json /usr/src/app/
+FROM node:latest
+WORKDIR /var/www/
+COPY . .
 RUN npm install
-COPY ./ /usr/src/app/
-EXPOSE 8080
-CMD [ "npm", "run", "serve" ]
+
+# build
+CMD [ "npm", "run", "build" ]
+
+# # reverse proxy
+# EXPOSE 8080
+# CMD [ "npm", "run", "serve" ]

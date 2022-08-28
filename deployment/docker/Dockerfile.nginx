@@ -1,2 +1,9 @@
-FROM nginx
-COPY deployment/docker/default.conf /etc/nginx/conf.d/
+FROM nginx:latest
+WORKDIR /var/www/
+# build
+COPY deployment/docker/default /etc/nginx/conf.d/default.conf
+# # reverse proxy
+# COPY deployment/docker/default.conf /etc/nginx/conf.d/
+
+EXPOSE 80 443
+CMD ["nginx", "-g", "daemon off;"]

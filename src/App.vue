@@ -57,4 +57,9 @@ html {
 .green {
   color: green;
 }
+@font-face {
+  font-family: 'CaskaydiaCove Nerd Font';
+  src: local('CaskaydiaCove Nerd Font'), url('./assets/Caskaydia.ttf'),
+    format('truetype');
+}
 </style>
