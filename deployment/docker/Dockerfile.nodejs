@@ -2,7 +2,7 @@ FROM node:latest
 WORKDIR /var/www/
 COPY . .
 # build
-CMD [ "npm", "run", "install", "&&", "npm", "run", "build" ]
+CMD [ "npm", "install", "&&", "npm", "run", "build" ]
 
 # # reverse proxy
 # RUN npm install
