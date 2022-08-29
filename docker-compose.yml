@@ -1,23 +1,28 @@
 version: '3'
 
 services:
-  nodejs:
+  frontend:
     build:
-      dockerfile: deployment/docker/Dockerfile.nodejs
+      dockerfile: deployment/docker/Dockerfile.frontend
       context: .
+      args:
+        NODE_PORT: ${NODE_PORT-8080}
     volumes:
       - .:/var/www/
-
-  nginx:
-    build:
-      dockerfile: deployment/docker/Dockerfile.nginx
-      context: .
+      - ./node_modules
     ports:
-      - 80:80 
-      - 443:443 
-    depends_on:
-      - nodejs
-    links:
-      - nodejs
-    volumes:
-      - .:/var/www/
+      - ${NODE_PORT-8080}:${NODE_PORT-8080}
+
+  # nginx:
+  #   build:
+  #     dockerfile: deployment/docker/Dockerfile.nginx
+  #     context: .
+  #   ports:
+  #     - 80:80 
+  #     - 443:443 
+  #   depends_on:
+  #     - frontend
+  #   links:
+  #     - frontend
+  #   volumes:
+  #     - .:/var/www/

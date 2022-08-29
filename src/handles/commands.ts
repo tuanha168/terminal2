@@ -1,7 +1,8 @@
 import CommandHistory from '@/constant/history'
+import axios from 'axios'
 
 const commands = {
-  run: (input: string): string => {
+  run: async (input: string): Promise<string> => {
     if (!input) return ''
     const [command] = input.split(' ')
     if (/^!(\d+)$/.test(command)) {
@@ -14,15 +15,22 @@ const commands = {
       return result?.val || ''
     }
     if (typeof commands[command as keyof typeof commands] === 'function') {
-      const output: string = commands[command as keyof typeof commands](command)
+      const output: string = await commands[command as keyof typeof commands](
+        command
+      )
 
       return output
     }
     return commands.notfound(command)
   },
+  notfound: (input: string) => {
+    return `Command not found: ${input}
+Type <span class="red">help</span> for list commands`
+  },
   help: () => {
     return `<span class="red">help</span>\t\tshow this document
-<span class="red">about</span>\t\tabout me
+<span class="red">whoami</span>\t\tabout me
+<span class="red">weather</span>\t\ttoday weather
 <span class="red">history</span>\t\thistory
 <span class="red">ls</span>\t\tlist directory
 <span class="red">pwd</span>\t\tcurrent directory
@@ -33,10 +41,6 @@ const commands = {
   },
   pwd: () => {
     return '/home'
-  },
-  notfound: (input: string) => {
-    return `Command not found: ${input}
-Type <span class="red">help</span> for list commands`
   },
   history: () => {
     const history = JSON.parse(localStorage.getItem('history') as string)
@@ -49,8 +53,18 @@ Type <span class="red">help</span> for list commands`
       .join('<br />')
     return output
   },
-  about: () => {
+  whoami: () => {
     return `I'm <span class="green">Ha Anh Tuan</span>, Communicator in Viet Nam, also a Front-End developer.`
+  },
+  weather: async () => {
+    const axi = axios.create()
+    const res = await axi.get('https://wttr.in/')
+    const el = document.createElement('html')
+    el.innerHTML = res.data
+    const style = el.querySelector('style[type="text/css"]')
+    const pre = el.querySelector('pre')
+    return `${style?.outerHTML}${pre?.outerHTML}
+<span style="font-size: 0.7rem">source: <a href="https://wttr.in/" target="_blank">https://wttr.in/</a></span>`
   }
 }
 

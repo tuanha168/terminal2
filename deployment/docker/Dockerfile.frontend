@@ -1,0 +1,19 @@
+FROM node:slim
+WORKDIR /var/www/
+COPY . .
+# serve
+ARG NODE_PORT
+ENV NODE_PORT ${NODE_PORT}
+EXPOSE ${NODE_PORT}
+CMD [ "sh", "-c", "yarn && yarn serve --port ${NODE_PORT}" ]
+
+# build
+# keep
+# CMD [ "sh", "-c", "yarn && yarn build && tail -f /dev/null"]
+# release
+# CMD [ "sh", "-c", "yarn && yarn build"]
+
+# reverse proxy
+# RUN npm install
+# EXPOSE 8080
+# CMD [ "npm", "run", "serve" ]

@@ -26,6 +26,7 @@
           v-show="currentPos - 1 === idx || (idx === 0 && currentPos === 0)"
         ></div>
       </span>
+      <p style="font-weight: normal" v-if="loading">loading...</p>
     </div>
     <input
       ref="input"
@@ -48,11 +49,12 @@ const currentPos = ref<number>(0)
 const currentHistory = ref<number>(1)
 const loopThroughHistory = ref<boolean>(false)
 const flagHistory = ref<boolean>(false)
+const loading = ref<boolean>(false)
 const input = ref<HTMLInputElement>()
 const history = ref<Array<CommandHistory>>([INIT_MESSAGE])
 const pwd = ref<string>('/home')
 
-const submit = () => {
+const submit = async () => {
   if (/^!(\d+)$/.test(userInput.value)) {
     flagHistory.value = true
     userInput.value = commands.run(userInput.value)
@@ -62,7 +64,9 @@ const submit = () => {
   if (userInput.value === 'clear') {
     history.value = [INIT_MESSAGE]
   } else {
-    output = commands.run(userInput.value)
+    loading.value = true
+    output = await commands.run(userInput.value)
+    loading.value = false
   }
   const val: CommandHistory = {
     id: history.value.length,

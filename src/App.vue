@@ -62,4 +62,7 @@ html {
   src: local('CaskaydiaCove Nerd Font'), url('./assets/Caskaydia.ttf'),
     format('truetype');
 }
+pre {
+  font-size: 1rem;
+}
 </style>
