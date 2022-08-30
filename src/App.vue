@@ -63,6 +63,9 @@ html {
     format('truetype');
 }
 pre {
-  font-size: 1rem;
+  font-size: 75%;
+  font-family: 'Source Code Pro', 'DejaVu Sans Mono', Menlo,
+    'Lucida Sans Typewriter', 'Lucida Console', monaco,
+    'Bitstream Vera Sans Mono', monospace;
 }
 </style>

@@ -26,12 +26,13 @@
           v-show="currentPos - 1 === idx || (idx === 0 && currentPos === 0)"
         ></div>
       </span>
-      <p style="font-weight: normal" v-if="loading">loading...</p>
+      <p style="font-weight: normal; margin: 0" v-if="loading">loading...</p>
     </div>
     <input
       ref="input"
       type="text"
       v-model="userInput"
+      :disabled="loading"
       @keydown="pressedEvent"
     />
   </div>
@@ -45,10 +46,12 @@ import INIT_MESSAGE from '@/constant/initMessage'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const userInput = ref<string>('')
+const currrentInput = ref<string>('')
 const currentPos = ref<number>(0)
 const currentHistory = ref<number>(1)
 const loopThroughHistory = ref<boolean>(false)
 const flagHistory = ref<boolean>(false)
+const flagCompletion = ref<boolean>(false)
 const loading = ref<boolean>(false)
 const input = ref<HTMLInputElement>()
 const history = ref<Array<CommandHistory>>([INIT_MESSAGE])
@@ -57,7 +60,7 @@ const pwd = ref<string>('/home')
 const submit = async () => {
   if (/^!(\d+)$/.test(userInput.value)) {
     flagHistory.value = true
-    userInput.value = commands.run(userInput.value)
+    userInput.value = await commands.run(userInput.value)
     return
   }
   let output = ''
@@ -67,6 +70,9 @@ const submit = async () => {
     loading.value = true
     output = await commands.run(userInput.value)
     loading.value = false
+    setTimeout(() => {
+      input.value?.scrollIntoView({ behavior: 'smooth' })
+    })
   }
   const val: CommandHistory = {
     id: history.value.length,
@@ -88,6 +94,7 @@ const moveCursor = (key: string) => {
   switch (true) {
     case /^Enter$/g.test(key):
       currentPos.value = userInput.value.length
+      flagCompletion.value = false
       break
     case /^ArrowUp$/g.test(key):
       if (userInput.value.length === 0 || loopThroughHistory.value) {
@@ -96,22 +103,26 @@ const moveCursor = (key: string) => {
       } else {
         currentPos.value = 0
       }
+      flagCompletion.value = false
       break
     case /^Backspace$/g.test(key):
       if (currentPos.value > 0) {
         currentPos.value--
       }
       loopThroughHistory.value = false
+      flagCompletion.value = false
       break
     case /^ArrowLeft$/g.test(key):
       if (currentPos.value <= userInput.value.length && currentPos.value > 0) {
         currentPos.value--
       }
       loopThroughHistory.value = false
+      flagCompletion.value = false
       break
     case /^ArrowDown$/g.test(key):
       currentPos.value = userInput.value.length
       loopThroughHistory.value = false
+      flagCompletion.value = false
       break
     case /^ArrowRight$/g.test(key):
     case /^.$/g.test(key):
@@ -119,6 +130,7 @@ const moveCursor = (key: string) => {
         currentPos.value++
       }
       loopThroughHistory.value = false
+      flagCompletion.value = false
       break
     default:
       break
@@ -145,6 +157,22 @@ const getHistory = () => {
 }
 
 const pressedEvent = (e: KeyboardEvent) => {
+  if (e.key === 'Tab') {
+    e.preventDefault()
+    if (!flagCompletion.value) {
+      currrentInput.value = userInput.value
+      flagCompletion.value = true
+    }
+    userInput.value = commands.tabCompletions(currrentInput.value)
+  }
+  if (
+    e.metaKey ||
+    e.altKey ||
+    e.ctrlKey ||
+    (e.shiftKey && e.key.length !== 1)
+  ) {
+    return
+  }
   if (e.key === 'Enter') {
     submit()
     currentHistory.value = history.value.length
@@ -159,9 +187,6 @@ const pressedEvent = (e: KeyboardEvent) => {
     })
   }
 
-  if (e.altKey || e.ctrlKey || (e.shiftKey && e.key.length !== 1)) {
-    return
-  }
   setTimeout(() => {
     moveCursor(e.key)
   })
@@ -169,7 +194,9 @@ const pressedEvent = (e: KeyboardEvent) => {
 
 const focusInput = (e?: KeyboardEvent) => {
   if (document.activeElement !== input.value) {
-    input.value?.focus()
+    input.value?.focus({
+      preventScroll: true
+    })
     setTimeout(() => {
       moveCursor(e?.key || '')
     })

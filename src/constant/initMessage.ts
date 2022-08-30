@@ -1,6 +1,6 @@
 import CommandHistory from './history'
 
-const output = [
+const logo = [
   '           _                         ',
   '  _____   (_)  _____   ____     ____ ',
   ' / ___/  / /  / ___/  / __ \\   / __ \\',
@@ -9,6 +9,15 @@ const output = [
 ]
   .join('<br/>')
   .replace(/\s/g, '&nbsp;')
+
+const output =
+  logo +
+  [
+    '',
+    '',
+    'Welcome to my page,',
+    'Type <span class="red">help</span> to view list available commands'
+  ].join('<br/>')
 
 const INIT_MESSAGE: CommandHistory = {
   id: 0,
