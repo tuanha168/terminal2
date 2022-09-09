@@ -4,8 +4,8 @@ import axios from 'axios'
 const axi = axios.create()
 
 const commands = {
-  run: async (input: string): Promise<string> => {
-    if (!input) return ''
+  run: async (input: string, isCommand = true): Promise<string> => {
+    if (!input || !isCommand) return ''
     const [command] = input.split(' ')
     if (/^!(\d+)$/.test(command)) {
       const index: number = parseInt(/^!(\d+)$/.exec(command)?.[1] || '')

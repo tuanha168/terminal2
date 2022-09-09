@@ -57,10 +57,10 @@ const input = ref<HTMLInputElement>()
 const history = ref<Array<CommandHistory>>([INIT_MESSAGE])
 const pwd = ref<string>('/home')
 
-const submit = async () => {
+const submit = async (isCommand = true) => {
   if (/^!(\d+)$/.test(userInput.value)) {
     flagHistory.value = true
-    userInput.value = await commands.run(userInput.value)
+    userInput.value = await commands.run(userInput.value, isCommand)
     return
   }
   let output = ''
@@ -68,7 +68,7 @@ const submit = async () => {
     history.value = [INIT_MESSAGE]
   } else {
     loading.value = true
-    output = await commands.run(userInput.value)
+    output = await commands.run(userInput.value, isCommand)
     loading.value = false
     setTimeout(() => {
       input.value?.scrollIntoView({ behavior: 'smooth' })
@@ -163,7 +163,10 @@ const pressedEvent = (e: KeyboardEvent) => {
       currrentInput.value = userInput.value
       flagCompletion.value = true
     }
-    userInput.value = commands.tabCompletions(currrentInput.value)
+    userInput.value = commands.tabCompletions(currrentInput.value) || ''
+  }
+  if (e.ctrlKey && e.key === 'c') {
+    return breakCommand()
   }
   if (
     e.metaKey ||
@@ -190,6 +193,10 @@ const pressedEvent = (e: KeyboardEvent) => {
   setTimeout(() => {
     moveCursor(e.key)
   })
+}
+
+const breakCommand = () => {
+  submit(false)
 }
 
 const focusInput = (e?: KeyboardEvent) => {
