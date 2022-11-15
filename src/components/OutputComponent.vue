@@ -15,17 +15,13 @@
 
 <script setup lang="ts">
 import CommandHistory from '../constant/history'
-import { defineProps, defineExpose, PropType } from 'vue'
+import { defineProps, PropType } from 'vue'
 
-const props = defineProps({
+defineProps({
   history: {
     type: Array as PropType<Array<CommandHistory>>
   },
   pwd: String || null
-})
-
-defineExpose({
-  history: props.history
 })
 </script>
 
