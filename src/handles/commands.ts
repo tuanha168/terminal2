@@ -1,7 +1,13 @@
 import CommandHistory from '@/constant/history'
 import axios from 'axios'
 
-const axi = axios.create()
+const axi = axios.create({
+  timeout: 2000
+})
+
+const isValidCommand = (command: string): command is keyof typeof commands => {
+  return Object.keys(commands).includes(command)
+}
 
 const commands = {
   run: async (input: string, isCommand = true): Promise<string> => {
@@ -16,10 +22,8 @@ const commands = {
       )?.[index - 1]
       return result?.val || ''
     }
-    if (typeof commands[command as keyof typeof commands] === 'function') {
-      const output: string = await commands[command as keyof typeof commands](
-        command
-      )
+    if (isValidCommand(command)) {
+      const output = (await commands[command](command)) || ''
 
       return output
     }
@@ -42,7 +46,9 @@ Type <span class="red">help</span> for list commands`
 `
   },
   history: () => {
-    const history = JSON.parse(localStorage.getItem('history') as string)
+    const history: CommandHistory[] | undefined = JSON.parse(
+      localStorage.getItem('history') as string
+    )
     const output = history
       ?.filter(
         (it: CommandHistory) =>
@@ -56,13 +62,17 @@ Type <span class="red">help</span> for list commands`
     return `I'm <span class="green">Ha Anh Tuan</span>, Communicator in Viet Nam, also a Front-End developer.`
   },
   weather: async () => {
-    const res = await axi.get('https://wttr.in/')
-    const el = document.createElement('html')
-    el.innerHTML = res.data
-    const style = el.querySelector('style[type="text/css"]')
-    const pre = el.querySelector('pre')
-    return `${style?.outerHTML}${pre?.outerHTML}
+    try {
+      const res = await axi.get('https://wttr.in/')
+      const el = document.createElement('html')
+      el.innerHTML = res.data
+      const style = el.querySelector('style[type="text/css"]')
+      const pre = el.querySelector('pre')
+      return `${style?.outerHTML}${pre?.outerHTML}
 <span style="font-size: 0.7rem">source: <a href="https://wttr.in/" target="_blank">https://wttr.in/</a></span>`
+    } catch (e) {
+      return 'Failed to fetch weather'
+    }
   },
   'ip-address': async () => {
     const res = await axi.get('https://api.ipify.org?format=json')
