@@ -1,0 +1,51 @@
+version: 0.2
+
+env:
+  secrets-manager:
+    DOCKER_USER: arn:aws:secretsmanager:ap-southeast-1:556527881658:secret:hello-chat-api-staging-FUNCbU:DOCKER_USER
+    DOCKER_TOKEN: arn:aws:secretsmanager:ap-southeast-1:556527881658:secret:hello-chat-api-staging-FUNCbU:DOCKER_TOKEN
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo Logging in to Amazon ECR....
+      - aws --version
+      # login to Elastic container registry
+      - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 253950403485.dkr.ecr.ap-southeast-1.amazonaws.com
+      - echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
+
+      # ARN
+      - TASK_ROLE=arn:aws:iam::556527881658:role/ecsTaskExecutionRole
+      - REPOSITORY_URI=556527881658.dkr.ecr.ap-southeast-1.amazonaws.com
+
+      - IMAGE_REPO=terminal-project
+      - IMAGE_URI_WEB=$REPOSITORY_URI/$IMAGE_REPO
+      - IMAGE_TAG=$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - LOG_GROUP=/ecs/$IMAGE_REPO
+
+  pre_build:
+    commands:
+      - echo 'Start pre_build phase'
+      - npm -v
+      - node --version
+
+  build:
+    commands:
+      - echo Building the Docker image...
+      - docker build --platform linux/amd64 -t $IMAGE_REPO:latest -f ./deployment/docker/ecs/Dockerfile . --no-cache
+      - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker image ls -a
+      - docker push $IMAGE_URI_WEB:$IMAGE_TAG
+      - cat taskdef-template-stg.json | sed -e s@\<IMAGE_NGINX\>@$IMAGE_URI_WEB:$IMAGE_TAG@ -e s@\<LOG_GROUP\>@$LOG_GROUP@ -e s@\<TASK_ROLE\>@$TASK_ROLE@ -e s@\<EXECUTION_ROLE\>@$TASK_ROLE@ > taskdef.json
+
+artifacts:
+  files:
+    - appspec.yml
+    - taskdef.json
