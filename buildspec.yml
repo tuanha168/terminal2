@@ -22,7 +22,7 @@ phases:
 
       - IMAGE_REPO=terminal-project
       - IMAGE_URI_WEB=$REPOSITORY_URI/$IMAGE_REPO
-      - IMAGE_TAG=$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - LOG_GROUP=/ecs/$IMAGE_REPO
 
   pre_build:
