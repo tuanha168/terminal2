@@ -36,17 +36,12 @@ phases:
     commands:
       - echo Building the Docker image...
       - docker build --platform linux/amd64 -t $IMAGE_REPO:latest -f ./deployment/ecs/Dockerfile . --no-cache
-      - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:1
-      - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:latest
-      - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:$IMAGE_TAG
 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - docker image ls -a
-      - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:1
-      - docker push $IMAGE_URI_WEB:1
       - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:latest
       - docker push $IMAGE_URI_WEB:latest
       - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:$IMAGE_TAG
