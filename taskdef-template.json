@@ -1,5 +1,5 @@
 {
-  "family": "chiruno-template",
+  "family": "task-template",
   "containerDefinitions": [
     {
       "name": "nginx",
