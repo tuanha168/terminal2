@@ -36,14 +36,15 @@ phases:
     commands:
       - echo Building the Docker image...
       - docker build --platform linux/amd64 -t $IMAGE_REPO -f ./deployment/ecs/Dockerfile . --no-cache
-      - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:$IMAGE_TAG
 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - docker image ls -a
+      - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:latest
       - docker push $IMAGE_URI_WEB:latest
+      - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:$IMAGE_TAG
       - docker push $IMAGE_URI_WEB:$IMAGE_TAG
       - cat taskdef-template.json | sed -e s@\<IMAGE_NGINX\>@$IMAGE_URI_WEB:$IMAGE_TAG@ -e s@\<LOG_GROUP\>@$LOG_GROUP@ -e s@\<TASK_ROLE\>@$TASK_ROLE@ -e s@\<EXECUTION_ROLE\>@$TASK_ROLE@ > taskdef.json
 
