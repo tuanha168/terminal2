@@ -37,7 +37,7 @@ const commands = {
 Type <span class="red">help</span> for list commands`
   },
   help: () => {
-    return `<span class="red">help</span>\t\tview this document
+    return `<span class="red">help</span>\t\tshow this document
 <span class="red">whoami</span>\t\tabout me
 <span class="red">weather</span>\t\ttoday weather
 <span class="red">ip-address</span>\t\tshow your ip address
