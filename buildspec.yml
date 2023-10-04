@@ -12,13 +12,14 @@ phases:
     commands:
       - echo Logging in to Amazon ECR....
       - aws --version
-      # login to Elastic container registry
-      - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 253950403485.dkr.ecr.ap-southeast-1.amazonaws.com
-      - echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
 
       # ARN
-      - TASK_ROLE=arn:aws:iam::556527881658:role/ecsTaskExecutionRole
+      - TASK_ROLE=arn:aws:iam::556527881658:role/CodePipelineRole
       - REPOSITORY_URI=556527881658.dkr.ecr.ap-southeast-1.amazonaws.com
+
+      # login to Elastic container registry
+      - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
+      - echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
 
       - IMAGE_REPO=terminal-project
       - IMAGE_URI_WEB=$REPOSITORY_URI/$IMAGE_REPO
