@@ -29,7 +29,7 @@ phases:
   pre_build:
     commands:
       - echo 'Start pre_build phase'
-      - npm -v
+      - yarn -v
       - node --version
 
   build:
