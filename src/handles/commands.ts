@@ -40,7 +40,7 @@ Type <span class="red">help</span> for list commands`
     return `<span class="red">help</span>\t\tshow this document
 <span class="red">whoami</span>\t\tabout me
 <span class="red">weather</span>\t\ttoday weather
-<span class="red">ip-address</span>\t\tshow your ip address
+<span class="red">ip-address</span>\tshow your ip address
 <span class="red">history</span>\t\tcommands history
 <span class="red">clear</span>\t\tclear screen
 `
