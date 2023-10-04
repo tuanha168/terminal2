@@ -2,8 +2,8 @@ version: 0.2
 
 env:
   secrets-manager:
-    DOCKER_USER: arn:aws:secretsmanager:ap-southeast-1:556527881658:secret:chiruno-secretManager-0.35090222735899346-KcuuHc:DOCKER_USER
-    DOCKER_TOKEN: arn:aws:secretsmanager:ap-southeast-1:556527881658:secret:chiruno-secretManager-0.35090222735899346-KcuuHc:DOCKER_TOKEN
+    DOCKER_USER: arn:aws:secretsmanager:ap-southeast-1:556527881658:secret:chiruno-secretManager-KcuuHc:DOCKER_USER
+    DOCKER_TOKEN: arn:aws:secretsmanager:ap-southeast-1:556527881658:secret:chiruno-secretManager-KcuuHc:DOCKER_TOKEN
 
 phases:
   install:
