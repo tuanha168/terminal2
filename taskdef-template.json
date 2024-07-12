@@ -15,7 +15,7 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "<LOG_GROUP>",
-          "awslogs-region": "ap-southeast-1",
+          "awslogs-region": "us-east-1",
           "awslogs-datetime-format": "%Y-%m-%d %H:%M:%S",
           "awslogs-stream-prefix": "nginx"
         }

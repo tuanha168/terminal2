@@ -2,8 +2,8 @@ version: 0.2
 
 env:
   secrets-manager:
-    DOCKER_USER: arn:aws:secretsmanager:ap-southeast-1:556527881658:secret:chiruno-secretManager-sxko6yzbr2-88D2th:DOCKER_USER
-    DOCKER_TOKEN: arn:aws:secretsmanager:ap-southeast-1:556527881658:secret:chiruno-secretManager-sxko6yzbr2-88D2th:DOCKER_TOKEN
+    DOCKER_USER: arn:aws:secretsmanager:us-east-1:556527881658:secret:terraform-secretManager-neib56wyo7-PzcJlo:DOCKER_USER
+    DOCKER_TOKEN: arn:aws:secretsmanager:us-east-1:556527881658:secret:terraform-secretManager-neib56wyo7-PzcJlo:DOCKER_TOKEN
 
 phases:
   install:
@@ -15,10 +15,10 @@ phases:
 
       # ARN
       - TASK_ROLE=arn:aws:iam::556527881658:role/TaskExecutionRole
-      - REPOSITORY_URI=556527881658.dkr.ecr.ap-southeast-1.amazonaws.com
+      - REPOSITORY_URI=556527881658.dkr.ecr.us-east-1.amazonaws.com
 
       # login to Elastic container registry
-      - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
       - echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
 
       - IMAGE_REPO=terminal
