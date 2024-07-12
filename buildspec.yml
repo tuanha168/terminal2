@@ -2,8 +2,10 @@ version: 0.2
 
 env:
   secrets-manager:
-    DOCKER_USER: arn:aws:secretsmanager:us-east-1:556527881658:secret:terraform-secretManager-neib56wyo7-PzcJlo:DOCKER_USER
-    DOCKER_TOKEN: arn:aws:secretsmanager:us-east-1:556527881658:secret:terraform-secretManager-neib56wyo7-PzcJlo:DOCKER_TOKEN
+    # TODO: update arn
+    DOCKER_USER: arn:aws:secretsmanager:us-east-1:556527881658:secret:terraform-secretManager-ylt33tdn2b8-hvNI5s:DOCKER_USER
+    DOCKER_TOKEN: arn:aws:secretsmanager:us-east-1:556527881658:secret:terraform-secretManager-ylt33tdn2b8-hvNI5s:DOCKER_TOKEN
+    TASK_ROLE: arn:aws:secretsmanager:us-east-1:556527881658:secret:terraform-secretManager-ylt33tdn2b8-hvNI5s:TASK_ROLE
 
 phases:
   install:
@@ -13,8 +15,7 @@ phases:
       - echo Logging in to Amazon ECR....
       - aws --version
 
-      # ARN
-      - TASK_ROLE=arn:aws:iam::556527881658:role/TaskExecutionRole
+      # TODO: update arn
       - REPOSITORY_URI=556527881658.dkr.ecr.us-east-1.amazonaws.com
 
       # login to Elastic container registry
