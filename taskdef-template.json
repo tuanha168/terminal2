@@ -1,8 +1,8 @@
 {
-  "family": "task-template",
+  "family": "__TASK_DEFINITION_FAMILY__",
   "containerDefinitions": [
     {
-      "name": "__TASK_NAME__",
+      "name": "nginx",
       "image": "__ECR_IMAGE__",
       "portMappings": [
         {
@@ -17,7 +17,7 @@
           "awslogs-group": "__LOG_GROUP__",
           "awslogs-region": "__AWS_REGION__",
           "awslogs-datetime-format": "%Y-%m-%d %H:%M:%S",
-          "awslogs-stream-prefix": "__TASK_NAME__"
+          "awslogs-stream-prefix": "nginx"
         }
       },
       "essential": true
