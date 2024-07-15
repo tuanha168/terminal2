@@ -40,6 +40,7 @@ phases:
       - docker image ls -a
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - sed -ie "s@__CONTAINER_NAME__@$IMAGE_REPO@" appspec.yml
       - cp taskdef-template.json taskdef.json
       - sed -ie "s@__ECR_IMAGE__@$REPOSITORY_URI:$IMAGE_TAG@" taskdef.json
       - sed -ie "s@__LOG_GROUP__@$LOG_GROUP@" taskdef.json
