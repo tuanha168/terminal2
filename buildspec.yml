@@ -2,10 +2,8 @@ version: 0.2
 
 env:
   secrets-manager:
-    # TODO: update arn
-    DOCKER_USER: arn:aws:secretsmanager:us-east-1:556527881658:secret:terraform-secretManager-ylt33tdn2b8-hvNI5s:DOCKER_USER
-    DOCKER_TOKEN: arn:aws:secretsmanager:us-east-1:556527881658:secret:terraform-secretManager-ylt33tdn2b8-hvNI5s:DOCKER_TOKEN
-    TASK_ROLE: arn:aws:secretsmanager:us-east-1:556527881658:secret:terraform-secretManager-ylt33tdn2b8-hvNI5s:TASK_ROLE
+    DOCKER_USER: ${SECRETS_MANAGER_ARN}:DOCKER_USER
+    DOCKER_TOKEN: ${SECRETS_MANAGER_ARN}:DOCKER_TOKEN
 
 phases:
   install:
@@ -15,15 +13,10 @@ phases:
       - echo Logging in to Amazon ECR....
       - aws --version
 
-      # TODO: update arn
-      - REPOSITORY_URI=556527881658.dkr.ecr.us-east-1.amazonaws.com
-
       # login to Elastic container registry
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
       - echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
 
-      - IMAGE_REPO=terminal
-      - IMAGE_URI_WEB=$REPOSITORY_URI/$IMAGE_REPO
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - LOG_GROUP=/ecs/$IMAGE_REPO
 
@@ -37,17 +30,23 @@ phases:
     commands:
       - echo Building the Docker image...
       - docker build --platform linux/amd64 -t $IMAGE_REPO -f ./deployment/ecs/Dockerfile . --no-cache
-      - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:latest
-      - docker tag $IMAGE_REPO:latest $IMAGE_URI_WEB:$IMAGE_TAG
+      - docker tag $IMAGE_REPO:latest $REPOSITORY_URI:latest
+      - docker tag $IMAGE_REPO:latest $REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - docker image ls -a
-      - docker push $IMAGE_URI_WEB:latest
-      - docker push $IMAGE_URI_WEB:$IMAGE_TAG
-      - cat taskdef-template.json | sed -e s@\<IMAGE_NGINX\>@$IMAGE_URI_WEB:$IMAGE_TAG@ -e s@\<LOG_GROUP\>@$LOG_GROUP@ -e s@\<TASK_ROLE\>@$TASK_ROLE@ -e s@\<EXECUTION_ROLE\>@$TASK_ROLE@ > taskdef.json
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - cp taskdef-template.json taskdef.json
+      - sed -ie "s@__ECR_IMAGE__@$REPOSITORY_URI:$IMAGE_TAG@" taskdef.json
+      - sed -ie "s@__LOG_GROUP__@$LOG_GROUP@" taskdef.json
+      - sed -ie "s@__TASK_ROLE__@$TASK_EXECUTION_ROLE@" taskdef.json
+      - sed -ie "s@__EXECUTION_ROLE__@$TASK_EXECUTION_ROLE@" taskdef.json
+      - sed -ie "s@__TASK_NAME__@$IMAGE_REPO@" taskdef.json
+      - sed -ie "s@__AWS_REGION__@$AWS_REGION@" taskdef.json
 
 artifacts:
   files:

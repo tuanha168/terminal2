@@ -2,8 +2,8 @@
   "family": "task-template",
   "containerDefinitions": [
     {
-      "name": "nginx",
-      "image": "<IMAGE_NGINX>",
+      "name": "__TASK_NAME__",
+      "image": "__ECR_IMAGE__",
       "portMappings": [
         {
           "containerPort": 80,
@@ -14,17 +14,17 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "<LOG_GROUP>",
-          "awslogs-region": "us-east-1",
+          "awslogs-group": "__LOG_GROUP__",
+          "awslogs-region": "__AWS_REGION__",
           "awslogs-datetime-format": "%Y-%m-%d %H:%M:%S",
-          "awslogs-stream-prefix": "nginx"
+          "awslogs-stream-prefix": "__TASK_NAME__"
         }
       },
       "essential": true
     }
   ],
-  "taskRoleArn": "<TASK_ROLE>",
-  "executionRoleArn": "<EXECUTION_ROLE>",
+  "taskRoleArn": "__TASK_ROLE__",
+  "executionRoleArn": "__EXECUTION_ROLE__",
   "cpu": "256",
   "memory": "512",
   "networkMode": "awsvpc",
