@@ -2,11 +2,11 @@
   "family": "__TASK_DEFINITION_FAMILY__",
   "containerDefinitions": [
     {
-      "name": "nginx",
+      "name": "__CONTAINER_NAME__",
       "image": "__ECR_IMAGE__",
       "portMappings": [
         {
-          "containerPort": 80,
+          "containerPort": "__CONTAINER_PORT__",
           "hostPort": 80,
           "protocol": "tcp"
         }
@@ -17,7 +17,7 @@
           "awslogs-group": "__LOG_GROUP__",
           "awslogs-region": "__AWS_REGION__",
           "awslogs-datetime-format": "%Y-%m-%d %H:%M:%S",
-          "awslogs-stream-prefix": "nginx"
+          "awslogs-stream-prefix": "__CONTAINER_NAME__"
         }
       },
       "essential": true
