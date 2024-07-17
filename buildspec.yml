@@ -40,10 +40,10 @@ phases:
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - sed -ie "s@__CONTAINER_NAME__@$CONTAINER_NAME@" appspec.yml
-      - sed -ie "s@\"__CONTAINER_PORT__\"@$CONTAINER_PORT@" appspec.yml
+      - sed -ie "s@__CONTAINER_PORT__@$CONTAINER_PORT@" appspec.yml
       - cp taskdef-template.json $TASK_DEFINITION_FILE_NAME
       - sed -ie "s@__CONTAINER_NAME__@$CONTAINER_NAME@" $TASK_DEFINITION_FILE_NAME
-      - sed -ie "s@\"__CONTAINER_PORT__\"@$CONTAINER_PORT@" $TASK_DEFINITION_FILE_NAME
+      - sed -ie "s@__CONTAINER_PORT__@$CONTAINER_PORT@" $TASK_DEFINITION_FILE_NAME
       - sed -ie "s@__TASK_DEFINITION_FAMILY__@$TASK_DEFINITION_FAMILY@" $TASK_DEFINITION_FILE_NAME
       - sed -ie "s@__AWS_REGION__@$AWS_REGION@" $TASK_DEFINITION_FILE_NAME
       - sed -ie "s@__ECR_IMAGE__@$REPOSITORY_URI:$IMAGE_TAG@" $TASK_DEFINITION_FILE_NAME
