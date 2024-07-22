@@ -22,7 +22,7 @@ html {
 
 #app {
   word-break: break-all;
-  font-family: CaskaydiaCove Nerd Font, monospace;
+  font-family: monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #fff;
@@ -57,11 +57,11 @@ html {
 .green {
   color: green;
 }
-@font-face {
-  font-family: 'CaskaydiaCove Nerd Font';
-  src: local('CaskaydiaCove Nerd Font'), url('./assets/Caskaydia.ttf'),
-    format('truetype');
-}
+/* @font-face { */
+/*   font-family: 'CaskaydiaCove Nerd Font'; */
+/*   src: local('CaskaydiaCove Nerd Font'), url('./assets/Caskaydia.ttf'), */
+/*     format('truetype'); */
+/* } */
 pre {
   font-size: 75%;
   font-family: 'Source Code Pro', 'DejaVu Sans Mono', Menlo,
