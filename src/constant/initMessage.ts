@@ -15,7 +15,7 @@ const output =
   [
     '',
     '',
-    'Welcome to my custom page,',
+    'Welcome',
     'Type <span class="red">help</span> to view list available commands'
   ].join('<br/>')
 
