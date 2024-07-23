@@ -1,0 +1,33 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - aws --version
+
+  pre_build:
+    commands:
+      - echo 'Start pre_build phase'
+      - yarn -v
+      - node --version
+
+  build:
+    commands:
+      - yarn install --frozen-lockfile
+      - yarn build
+
+  post_build:
+    commands:
+      # Clear S3 bucket.
+      - aws s3 rm s3://${S3_BUCKET_ARN} --recursive
+      - echo S3 bucket is cleared.
+      - aws s3 cp dist s3://${S3_BUCKET_ARN}/ --recursive
+      - echo Build completed on `date`
+
+artifacts:
+    files:
+      - '**/*'
+    discard-paths: no
+    base-directory: 'dist'
