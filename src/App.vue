@@ -1,17 +1,9 @@
 <template>
-  <Terminal />
+  <router-view />
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import Terminal from './components/TerminalComponent.vue'
-
-export default defineComponent({
-  name: 'App',
-  components: {
-    Terminal
-  }
-})
+<script lang="ts" setup>
+import { RouterView } from 'vue-router'
 </script>
 
 <style>
