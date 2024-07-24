@@ -15,7 +15,7 @@ const output =
   [
     '',
     '',
-    'Welcome abcef',
+    'Welcome yopaz',
     'Type <span class="red">help</span> to view list available commands'
   ].join('<br/>')
 
